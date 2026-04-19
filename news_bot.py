@@ -1,8 +1,9 @@
 import feedparser
 import requests
+import os
 
-TOKEN = "8666466903:AAGH3Pk_5Eg8Rz7EfYMZj6IuqzqPs6_DmrQ"
-CHAT_ID = "2108495737"
+TOKEN = os.environ["TELEGRAM_TOKEN"]
+CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
 
 # 키워드 파일에서 읽어오기
 with open("keywords.txt", "r", encoding="utf-8") as f:
