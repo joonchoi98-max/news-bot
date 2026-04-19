@@ -78,7 +78,7 @@ def analyze_with_gemini(keyword, today_articles, yesterday_articles):
 📋 변화 없는 것
 """
 
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key={GEMINI_API_KEY}"
     body = {"contents": [{"parts": [{"text": prompt}]}]}
     res = requests.post(url, json=body)
     data = res.json()
