@@ -82,8 +82,12 @@ def analyze_with_gemini(keyword, today_articles, yesterday_articles):
     body = {"contents": [{"parts": [{"text": prompt}]}]}
     res = requests.post(url, json=body)
     data = res.json()
-    return data["candidates"][0]["content"]["parts"][0]["text"]
-
+  if "candidates" in data:
+        return data["candidates"][0]["content"]["parts"][0]["text"]
+    else:
+        print("Gemini 오류:", data)
+        return "분석 실패"
+        
 # 날짜
 today = datetime.now().strftime("%Y-%m-%d")
 yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
