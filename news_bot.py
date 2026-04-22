@@ -118,7 +118,7 @@ for keyword in keywords:
     message += analysis
     message += f"\n\n🔗 *근거 기사*\n"
     for i, article in enumerate(new_articles[:5], 1):
-        message += f"{i}. {article.title}\n{article.link}\n"
+        message += f"{i}. [{article.title}]({article.link})\n"
 
     send_telegram(message)
     print(f"{keyword} 전송 완료")
