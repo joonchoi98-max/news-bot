@@ -8,11 +8,9 @@ TOKEN = os.environ["TELEGRAM_TOKEN"]
 CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
 GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
 
-# 키워드 파일 읽기
 with open("keywords.txt", "r", encoding="utf-8") as f:
     keywords = [line.strip() for line in f if line.strip()]
 
-# 이미 보낸 링크 목록 읽기
 SENT_FILE = "sent_links.txt"
 if os.path.exists(SENT_FILE):
     with open(SENT_FILE, "r", encoding="utf-8") as f:
@@ -30,7 +28,7 @@ def send_telegram(message):
     payload = {
         "chat_id": CHAT_ID,
         "text": message,
-        "parse_mode": "Markdown"
+        "parse_mode": "HTML"
     }
     requests.post(url, data=payload)
 
@@ -76,6 +74,8 @@ def analyze_with_gemini(keyword, today_articles, yesterday_articles):
 📈 새로 생긴 이슈
 📉 사라진 이슈
 📋 변화 없는 것
+
+주의: 마크다운 기호(##, **, __ 등)는 절대 사용하지 마세요. 이모지와 일반 텍스트만 사용하세요.
 """
 
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={GEMINI_API_KEY}"
@@ -88,7 +88,6 @@ def analyze_with_gemini(keyword, today_articles, yesterday_articles):
         print("Gemini 오류:", data)
         return "분석 실패"
 
-# 날짜
 today = datetime.now().strftime("%Y-%m-%d")
 yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
 
@@ -102,28 +101,24 @@ for keyword in keywords:
         print(f"{keyword} - 새 기사 없음")
         continue
 
-    # DB 저장
     for article in new_articles[:5]:
         save_to_db(keyword, article.title, article.link)
         new_links.append(article.link)
 
-    # Gemini 분석
     today_db = get_articles_by_date(keyword, today)
     yesterday_db = get_articles_by_date(keyword, yesterday)
     analysis = analyze_with_gemini(keyword, today_db, yesterday_db)
 
-    # 메시지 구성
     today_str = datetime.now().strftime("%Y-%m-%d")
-    message = f"*[{keyword} 일일 분석] {today_str}*\n\n"
+    message = f"<b>[{keyword} 일일 분석] {today_str}</b>\n\n"
     message += analysis
-    message += f"\n\n🔗 *근거 기사*\n"
+    message += f"\n\n🔗 <b>근거 기사</b>\n"
     for i, article in enumerate(new_articles[:5], 1):
-        message += f"{i}. [{article.title}]({article.link})\n"
+        message += f'{i}. <a href="{article.link}">{article.title}</a>\n'
 
     send_telegram(message)
     print(f"{keyword} 전송 완료")
 
-# 새로 보낸 링크 저장
 if new_links:
     with open(SENT_FILE, "a", encoding="utf-8") as f:
         for link in new_links:
