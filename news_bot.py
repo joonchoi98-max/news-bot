@@ -17,7 +17,7 @@ SENT_FILE = "sent_links.txt"
 DB_FILE = "news_db.json"
 ANALYSIS_FILE = "analysis_db.json"
 
-REAL_ESTATE_KEYWORDS = {"부동산규제", "아파트실거래가", "부동산정책"}
+REAL_ESTATE_KEYWORDS = {"부동산"}
 
 if os.path.exists(SENT_FILE):
     with open(SENT_FILE, "r", encoding="utf-8") as f:
