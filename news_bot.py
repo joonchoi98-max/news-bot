@@ -17,6 +17,8 @@ SENT_FILE = "sent_links.txt"
 DB_FILE = "news_db.json"
 ANALYSIS_FILE = "analysis_db.json"
 
+REAL_ESTATE_KEYWORDS = {"부동산"}
+
 if os.path.exists(SENT_FILE):
     with open(SENT_FILE, "r", encoding="utf-8") as f:
         sent_links = set(line.strip() for line in f)
@@ -76,10 +78,8 @@ def save_analysis(keyword, date_str, analysis_text):
         json.dump(db, f, ensure_ascii=False, indent=2)
 
 
-def analyze_with_gemini(keyword, today_articles, yesterday_articles):
-    today_text = "\n".join([f"- {a['title']}" for a in today_articles]) or "없음"
-    yesterday_text = "\n".join([f"- {a['title']}" for a in yesterday_articles]) or "없음"
-    prompt = f"""당신은 뉴스 분석 전문가입니다.
+def _build_prompt(keyword, today_text, yesterday_text):
+    header = f"""당신은 뉴스 분석 전문가입니다.
 아래는 '{keyword}' 키워드의 어제와 오늘 뉴스입니다.
 
 [어제 뉴스]
@@ -88,14 +88,27 @@ def analyze_with_gemini(keyword, today_articles, yesterday_articles):
 [오늘 뉴스]
 {today_text}
 
-다음 형식으로 분석해주세요 (각 항목 1-2줄):
-📌 핵심 변화
-📈 새로 생긴 이슈
-📉 사라진 이슈
-📋 변화 없는 것
-
-주의: 마크다운 기호(##, **, __ 등)는 절대 사용하지 마세요. 이모지와 일반 텍스트만 사용하세요.
 """
+    footer = "\n주의: 마크다운 기호(##, **, __ 등)는 절대 사용하지 마세요. 이모지와 일반 텍스트만 사용하세요.\n"
+
+    if keyword in REAL_ESTATE_KEYWORDS:
+        body = """다음 3가지 관점으로 분석해주세요 (각 항목 1-2줄):
+🏛 정책변화: 최근 정부/지자체 부동산 정책 변화
+📊 가격동향: 아파트, 전세 등 가격 흐름
+💰 투자시사점: 위 내용을 종합한 시장 시사점"""
+    else:
+        body = """다음 3가지 항목으로 분석해주세요 (각 항목 1-2줄):
+📌 핵심 변화: 어제 대비 오늘 달라진 핵심 흐름
+📈 새로 부상한 이슈: 오늘 처음 등장한 주제나 사건
+💡 주목 포인트: 앞으로 지켜봐야 할 한 가지 포인트"""
+
+    return header + body + footer
+
+
+def analyze_with_gemini(keyword, today_articles, yesterday_articles):
+    today_text = "\n".join([f"- {a['title']}" for a in today_articles]) or "없음"
+    yesterday_text = "\n".join([f"- {a['title']}" for a in yesterday_articles]) or "없음"
+    prompt = _build_prompt(keyword, today_text, yesterday_text)
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={GEMINI_API_KEY}"
     body = {"contents": [{"parts": [{"text": prompt}]}]}
     res = requests.post(url, json=body)
