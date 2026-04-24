@@ -119,6 +119,26 @@ def analyze_with_gemini(keyword, today_articles, yesterday_articles):
     return "분석 실패"
 
 
+def cleanup_db():
+    cutoff = (datetime.now() - timedelta(days=14)).strftime("%Y-%m-%d")
+
+    if os.path.exists(DB_FILE):
+        with open(DB_FILE, "r", encoding="utf-8") as f:
+            db = json.load(f)
+        kept = [a for a in db if a["date"] >= cutoff]
+        with open(DB_FILE, "w", encoding="utf-8") as f:
+            json.dump(kept, f, ensure_ascii=False, indent=2)
+        print(f"DB 정리: {len(db) - len(kept)}개 삭제, {len(kept)}개 보존")
+
+    if os.path.exists(ANALYSIS_FILE):
+        with open(ANALYSIS_FILE, "r", encoding="utf-8") as f:
+            analysis_db = json.load(f)
+        for kw in analysis_db:
+            analysis_db[kw] = {d: v for d, v in analysis_db[kw].items() if d >= cutoff}
+        with open(ANALYSIS_FILE, "w", encoding="utf-8") as f:
+            json.dump(analysis_db, f, ensure_ascii=False, indent=2)
+
+
 _CSS = """
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif; background: #06091a; color: #e2e8f0; min-height: 100vh; position: relative; overflow-x: hidden; }
@@ -162,10 +182,13 @@ _JS = """
 
 
 def generate_html_dashboard():
+    html_cutoff = (datetime.now() - timedelta(days=7)).strftime("%Y-%m-%d")
+
     db = []
     if os.path.exists(DB_FILE):
         with open(DB_FILE, "r", encoding="utf-8") as f:
             db = json.load(f)
+    db = [a for a in db if a["date"] >= html_cutoff]
 
     analysis_db = load_analysis_db()
 
@@ -313,4 +336,5 @@ if new_links:
         for link in new_links:
             f.write(link + "\n")
 
+cleanup_db()
 generate_html_dashboard()
