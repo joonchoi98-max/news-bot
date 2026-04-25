@@ -152,10 +152,10 @@ _CSS = """
     .tab-btn { padding: 10px 22px; border: 1px solid rgba(99,102,241,.28); border-radius: 24px; background: rgba(13,13,43,.85); color: #7986b8; font-size: 0.93rem; font-weight: 600; cursor: pointer; transition: all .18s; }
     .tab-btn:hover { border-color: #818cf8; color: #a5b4fc; background: rgba(99,102,241,.1); }
     .tab-btn.active { background: linear-gradient(135deg, #4338ca, #7c3aed); border-color: transparent; color: white; box-shadow: 0 0 18px rgba(124,58,237,.45), 0 4px 14px rgba(99,102,241,.3); }
-    .analysis-box { background: rgba(13,10,38,.85); border: 1px solid rgba(139,92,246,.25); border-left: 4px solid #7c3aed; border-radius: 12px; padding: 20px 24px; margin-bottom: 28px; backdrop-filter: blur(6px); }
+    .analysis-box { background: rgba(5,3,18,.97); border: 1px solid rgba(139,92,246,.25); border-left: 4px solid #7c3aed; border-radius: 12px; padding: 20px 24px; margin-bottom: 28px; backdrop-filter: blur(6px); }
     .analysis-title { font-size: 0.95rem; font-weight: 700; color: #a5b4fc; margin-bottom: 10px; }
     .analysis-date { font-weight: 400; color: #4b5280; font-size: 0.8rem; }
-    .analysis-content { font-size: 0.88rem; line-height: 2; color: #c8d0e8; }
+    .analysis-content { font-size: 0.95rem; line-height: 2; color: #f1f1f1; }
     .date-section { margin-bottom: 32px; }
     .date-header { font-size: 0.78rem; font-weight: 700; color: #4b5585; letter-spacing: 1px; text-transform: uppercase; padding-bottom: 8px; border-bottom: 1px solid rgba(99,102,241,.18); margin-bottom: 14px; }
     .articles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 12px; }
